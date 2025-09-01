@@ -1,0 +1,39 @@
+{
+  "projects": [
+    {
+      "name": "Cozy Fireplace",
+      "video": "../Source-Files/fireplace_loop.mp4",
+      "audio": "../Source-Files/fire_crackling.wav",
+      "duration": 8,
+      "output": "../Output/cozy_fireplace_8hrs.mp4"
+    },
+    {
+      "name": "Rainy Cottage Window",
+      "video": "../Source-Files/rain_window.mp4",
+      "audio": "../Source-Files/rain_sounds.mp3", 
+      "duration": 10,
+      "output": "../Output/rainy_cottage_10hrs.mp4"
+    },
+    {
+      "name": "Forest Cabin Night",
+      "video": "../Source-Files/forest_cabin.mp4",
+      "audio": "../Source-Files/crickets_frogs.wav",
+      "duration": 8,
+      "output": "../Output/forest_night_8hrs.mp4"
+    },
+    {
+      "name": "Snowy Mountain Cabin",
+      "video": "../Source-Files/snow_falling.mp4",
+      "audio": "../Source-Files/winter_wind.wav",
+      "duration": 9,
+      "output": "../Output/snowy_cabin_9hrs.mp4"
+    },
+    {
+      "name": "Thunderstorm Porch",
+      "video": "../Source-Files/storm_porch.mp4", 
+      "audio": "../Source-Files/thunder_rain.mp3",
+      "duration": 8,
+      "output": "../Output/thunderstorm_8hrs.mp4"
+    }
+  ]
+}
