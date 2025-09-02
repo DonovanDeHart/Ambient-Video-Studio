@@ -1,0 +1,274 @@
+{
+  "batch_config": {
+    "metadata": {
+      "name": "Production Batch - Ambient Video Studio",
+      "version": "2.0",
+      "created": "2024-01-01",
+      "description": "Commercial-grade batch processing configuration for ambient video creation",
+      "target_revenue": 2500,
+      "target_videos_per_month": 15
+    },
+    "system_settings": {
+      "max_concurrent_videos": 10,
+      "quality_threshold": 95,
+      "auto_retry_attempts": 3,
+      "resource_monitoring": true,
+      "auto_optimization": true,
+      "backup_enabled": true,
+      "backup_retention_days": 30
+    },
+    "gpu_configuration": {
+      "primary_gpu": 0,
+      "secondary_gpu": 1,
+      "gpu_assignments": {
+        "quality": 0,
+        "balanced": 0,
+        "fast": 1
+      },
+      "multi_gpu_processing": true,
+      "gpu_fallback": true
+    },
+    "export_presets": {
+      "youtube_4k": {
+        "resolution": "3840x2160",
+        "bitrate": "50M",
+        "codec": "h264_nvenc",
+        "preset": "slow",
+        "crf": "18",
+        "audio_bitrate": "192k"
+      },
+      "youtube_1080p": {
+        "resolution": "1920x1080",
+        "bitrate": "25M",
+        "codec": "h264_nvenc",
+        "preset": "medium",
+        "crf": "20",
+        "audio_bitrate": "192k"
+      },
+      "mobile_optimized": {
+        "resolution": "1280x720",
+        "bitrate": "8M",
+        "codec": "h264_nvenc",
+        "preset": "fast",
+        "crf": "23",
+        "audio_bitrate": "128k"
+      },
+      "social_media": {
+        "resolution": "1080x1080",
+        "bitrate": "15M",
+        "codec": "h264_nvenc",
+        "preset": "fast",
+        "crf": "22",
+        "audio_bitrate": "160k"
+      }
+    },
+    "projects": [
+      {
+        "id": "PROJ001",
+        "name": "Rain Forest Ambience - Premium Quality",
+        "priority": 1,
+        "status": "pending",
+        "theme": "rain",
+        "target_platform": "youtube",
+        "duration_hours": 10,
+        "quality": "quality",
+        "target_gpu": 0,
+        "estimated_duration": 45,
+        "video_input": "Source-Files\\rain_forest_4k.mp4",
+        "audio_input": "Source-Files\\rain_forest_ambient.wav",
+        "output_path": "Production\\Exports\\rain_forest_10hr_premium.mp4",
+        "export_preset": "youtube_4k",
+        "metadata": {
+          "title": "10 Hours of Rain Forest Ambience - Premium Quality",
+          "description": "Immerse yourself in the peaceful sounds of a rain forest. Perfect for sleep, study, meditation, and relaxation.",
+          "tags": ["rain", "forest", "ambience", "sleep", "study", "meditation", "relaxation", "nature", "10 hours"],
+          "category": "Nature",
+          "language": "en"
+        },
+        "seo_optimization": {
+          "keywords": ["rain forest sounds", "forest ambience", "rain ambience", "sleep sounds", "study music"],
+          "target_audience": ["sleep aid users", "students", "meditation practitioners", "nature lovers"],
+          "search_intent": "relaxation and focus enhancement"
+        },
+        "monetization": {
+          "ad_placement": "mid-roll",
+          "sponsorship_ready": true,
+          "merchandise_opportunity": true,
+          "estimated_revenue": 150
+        }
+      },
+      {
+        "id": "PROJ002",
+        "name": "Cozy Fireplace - Balanced Quality",
+        "priority": 2,
+        "status": "pending",
+        "theme": "fire",
+        "target_platform": "youtube",
+        "duration_hours": 8,
+        "quality": "balanced",
+        "target_gpu": 0,
+        "estimated_duration": 35,
+        "video_input": "Source-Files\\fireplace_cozy_1080p.mp4",
+        "audio_input": "Source-Files\\fireplace_crackling.wav",
+        "output_path": "Production\\Exports\\cozy_fireplace_8hr_balanced.mp4",
+        "export_preset": "youtube_1080p",
+        "metadata": {
+          "title": "8 Hours of Cozy Fireplace Ambience - Perfect for Relaxation",
+          "description": "Experience the warmth and comfort of a cozy fireplace. Ideal for winter evenings, reading, and peaceful sleep.",
+          "tags": ["fireplace", "fire", "cozy", "winter", "relaxation", "sleep", "reading", "ambience", "8 hours"],
+          "category": "Lifestyle",
+          "language": "en"
+        },
+        "seo_optimization": {
+          "keywords": ["fireplace sounds", "cozy fire", "fire ambience", "winter relaxation", "sleep sounds"],
+          "target_audience": ["winter lovers", "cozy content seekers", "relaxation enthusiasts"],
+          "search_intent": "winter comfort and relaxation"
+        },
+        "monetization": {
+          "ad_placement": "mid-roll",
+          "sponsorship_ready": true,
+          "merchandise_opportunity": false,
+          "estimated_revenue": 120
+        }
+      },
+      {
+        "id": "PROJ003",
+        "name": "Ocean Waves - Fast Production",
+        "priority": 3,
+        "status": "pending",
+        "theme": "ocean",
+        "target_platform": "youtube",
+        "duration_hours": 6,
+        "quality": "fast",
+        "target_gpu": 1,
+        "estimated_duration": 25,
+        "video_input": "Source-Files\\ocean_waves_1080p.mp4",
+        "audio_input": "Source-Files\\ocean_ambient.wav",
+        "output_path": "Production\\Exports\\ocean_waves_6hr_fast.mp4",
+        "export_preset": "youtube_1080p",
+        "metadata": {
+          "title": "6 Hours of Ocean Waves - Calming Beach Ambience",
+          "description": "Drift away with the soothing sounds of ocean waves. Perfect for stress relief, focus, and peaceful sleep.",
+          "tags": ["ocean", "waves", "beach", "calming", "stress relief", "focus", "sleep", "ambience", "6 hours"],
+          "category": "Nature",
+          "language": "en"
+        },
+        "seo_optimization": {
+          "keywords": ["ocean waves", "beach sounds", "ocean ambience", "calming sounds", "stress relief"],
+          "target_audience": ["stress relief seekers", "beach lovers", "meditation practitioners"],
+          "search_intent": "stress relief and relaxation"
+        },
+        "monetization": {
+          "ad_placement": "mid-roll",
+          "sponsorship_ready": false,
+          "merchandise_opportunity": false,
+          "estimated_revenue": 90
+        }
+      },
+      {
+        "id": "PROJ004",
+        "name": "Forest Night - Quality Focus",
+        "priority": 1,
+        "status": "pending",
+        "theme": "forest",
+        "target_platform": "youtube",
+        "duration_hours": 12,
+        "quality": "quality",
+        "target_gpu": 0,
+        "estimated_duration": 55,
+        "video_input": "Source-Files\\forest_night_4k.mp4",
+        "audio_input": "Source-Files\\forest_night_ambient.wav",
+        "output_path": "Production\\Exports\\forest_night_12hr_premium.mp4",
+        "export_preset": "youtube_4k",
+        "metadata": {
+          "title": "12 Hours of Forest Night Ambience - Premium Quality",
+          "description": "Experience the mysterious and peaceful sounds of a forest at night. Perfect for deep sleep and meditation.",
+          "tags": ["forest", "night", "ambience", "sleep", "meditation", "mysterious", "peaceful", "nature", "12 hours"],
+          "category": "Nature",
+          "language": "en"
+        },
+        "seo_optimization": {
+          "keywords": ["forest night", "night ambience", "forest sounds", "deep sleep", "meditation"],
+          "target_audience": ["deep sleep seekers", "meditation practitioners", "nature enthusiasts"],
+          "search_intent": "deep sleep and meditation"
+        },
+        "monetization": {
+          "ad_placement": "mid-roll",
+          "sponsorship_ready": true,
+          "merchandise_opportunity": true,
+          "estimated_revenue": 180
+        }
+      },
+      {
+        "id": "PROJ005",
+        "name": "Thunderstorm - Balanced Quality",
+        "priority": 2,
+        "status": "pending",
+        "theme": "thunder",
+        "target_platform": "youtube",
+        "duration_hours": 8,
+        "quality": "balanced",
+        "target_gpu": 0,
+        "estimated_duration": 35,
+        "video_input": "Source-Files\\thunderstorm_1080p.mp4",
+        "audio_input": "Source-Files\\thunder_rain.wav",
+        "output_path": "Production\\Exports\\thunderstorm_8hr_balanced.mp4",
+        "export_preset": "youtube_1080p",
+        "metadata": {
+          "title": "8 Hours of Thunderstorm Ambience - Powerful Storm Sounds",
+          "description": "Feel the power of nature with this thunderstorm ambience. Perfect for dramatic relaxation and focus.",
+          "tags": ["thunderstorm", "thunder", "rain", "storm", "dramatic", "relaxation", "focus", "ambience", "8 hours"],
+          "category": "Nature",
+          "language": "en"
+        },
+        "seo_optimization": {
+          "keywords": ["thunderstorm", "thunder sounds", "storm ambience", "dramatic relaxation", "powerful sounds"],
+          "target_audience": ["drama lovers", "power seekers", "storm enthusiasts"],
+          "search_intent": "dramatic relaxation and focus"
+        },
+        "monetization": {
+          "ad_placement": "mid-roll",
+          "sponsorship_ready": true,
+          "merchandise_opportunity": false,
+          "estimated_revenue": 130
+        }
+      }
+    ],
+    "quality_assurance": {
+      "auto_quality_check": true,
+      "loop_seamlessness_test": true,
+      "audio_quality_validation": true,
+      "video_resolution_check": true,
+      "file_integrity_test": true,
+      "preview_generation": true,
+      "thumbnail_auto_generation": true
+    },
+    "workflow_automation": {
+      "auto_scheduling": true,
+      "resource_optimization": true,
+      "batch_processing": true,
+      "auto_backup": true,
+      "performance_monitoring": true,
+      "error_recovery": true,
+      "progress_tracking": true
+    },
+    "analytics_tracking": {
+      "performance_metrics": true,
+      "quality_scores": true,
+      "processing_times": true,
+      "error_logging": true,
+      "resource_usage": true,
+      "revenue_tracking": true,
+      "audience_insights": true
+    },
+    "export_settings": {
+      "auto_export": true,
+      "multiple_formats": true,
+      "metadata_embedding": true,
+      "thumbnail_generation": true,
+      "backup_creation": true,
+      "quality_validation": true,
+      "platform_optimization": true
+    }
+  }
+}

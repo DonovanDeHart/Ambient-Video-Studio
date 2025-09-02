@@ -23,7 +23,8 @@
       "Bash(ffmpeg:*)",
       "Bash(ffmpeg:*)",
       "Bash(powershell:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
