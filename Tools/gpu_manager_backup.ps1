@@ -1,49 +1,34 @@
-# Enhanced GPU Manager for Ambient Video Studio
-# Combines simplicity with comprehensive GPU management capabilities
-# Detects, optimizes, and configures NVIDIA GPUs for video processing
+# GPU Manager - Multi-GPU detection and optimization for video processing
+# Detects and manages NVIDIA GPUs for FFmpeg acceleration
 
 param(
     [switch]$ListGPUs,
     [switch]$GetOptimalConfig,
-    [switch]$TestPerformance,
     [int]$TargetGPU = -1,
-    [string]$Quality = "balanced",
     [switch]$Help
 )
 
 if ($Help) {
     Write-Host @"
-🎮 Enhanced GPU Manager for Ambient Video Studio
-===============================================
-Detects, optimizes, and configures NVIDIA GPU usage for video processing
+GPU Manager for Ambient Video Studio
+===================================
+Detects and optimizes NVIDIA GPU usage for video processing
 
 Parameters:
-  -ListGPUs        Show all available NVIDIA GPUs with detailed info
-  -GetOptimalConfig Get optimal FFmpeg configuration for video processing
-  -TestPerformance Test GPU performance with sample encoding
-  -TargetGPU       Use specific GPU (0, 1, etc.) for targeted operations
-  -Quality         Quality profile: fast, balanced, or quality (default: balanced)
-  -Help            Show this help message
+  -ListGPUs        Show all available NVIDIA GPUs
+  -GetOptimalConfig Get optimal FFmpeg configuration
+  -TargetGPU       Use specific GPU (0, 1, etc.)
   
 Examples:
   .\gpu_manager.ps1 -ListGPUs
   .\gpu_manager.ps1 -GetOptimalConfig
-  .\gpu_manager.ps1 -TestPerformance
-  .\gpu_manager.ps1 -TargetGPU 0 -Quality quality
-  .\gpu_manager.ps1 -GetOptimalConfig -Quality fast
+  .\gpu_manager.ps1 -TargetGPU 0
 "@
     return
 }
 
 function Get-NvidiaGPUs {
     try {
-        # Check if nvidia-smi is available
-        $nvidiaSmi = Get-Command "nvidia-smi" -ErrorAction SilentlyContinue
-        if (-not $nvidiaSmi) {
-            Write-Host "❌ nvidia-smi not found. Please ensure NVIDIA drivers are installed." -ForegroundColor Red
-            return @()
-        }
-
         $gpuInfo = nvidia-smi --query-gpu=index,name,memory.total,memory.used,utilization.gpu,temperature.gpu --format=csv,noheader,nounits
         
         if (-not $gpuInfo) {
@@ -88,7 +73,7 @@ function Get-OptimalGPU {
 }
 
 function Get-FFmpegGPUConfig {
-    param([int]$GPUIndex, [string]$Profile = "balanced")
+    param([int]$GPUIndex, [string]$QualityProfile = "balanced")
     
     $configs = @{
         "fast" = @{
@@ -98,7 +83,6 @@ function Get-FFmpegGPUConfig {
             preset = "fast"
             crf = "28"
             additional = "-gpu $GPUIndex -rc:v vbr -cq:v 28 -b:v 0 -maxrate:v 50M -bufsize:v 100M"
-            description = "Fast encoding with lower quality, suitable for quick previews"
         }
         "balanced" = @{
             hwaccel = "cuda"
@@ -107,7 +91,6 @@ function Get-FFmpegGPUConfig {
             preset = "medium"
             crf = "23"
             additional = "-gpu $GPUIndex -rc:v vbr -cq:v 23 -b:v 0 -maxrate:v 30M -bufsize:v 60M -spatial_aq:v 1 -temporal_aq:v 1"
-            description = "Balanced quality and speed, recommended for most use cases"
         }
         "quality" = @{
             hwaccel = "cuda"
@@ -116,11 +99,10 @@ function Get-FFmpegGPUConfig {
             preset = "slow"
             crf = "20"
             additional = "-gpu $GPUIndex -rc:v vbr -cq:v 20 -b:v 0 -maxrate:v 25M -bufsize:v 50M -spatial_aq:v 1 -temporal_aq:v 1 -aq-strength:v 15"
-            description = "High quality encoding, slower but better results"
         }
     }
     
-    return $configs[$Profile]
+    return $configs[$QualityProfile]
 }
 
 function Test-GPUPerformance {
@@ -128,18 +110,10 @@ function Test-GPUPerformance {
     
     Write-Host "🧪 Testing GPU $GPUIndex performance..." -ForegroundColor Yellow
     
-    # Check if FFmpeg is available
-    $ffmpeg = Get-Command "ffmpeg" -ErrorAction SilentlyContinue
-    if (-not $ffmpeg) {
-        Write-Host "❌ FFmpeg not found. Please install FFmpeg to test GPU performance." -ForegroundColor Red
-        return -1
-    }
-    
     # Create a small test video
-    $testCmd = "ffmpeg -y -hwaccel cuda -hwaccel_device $GPUIndex -f lavfi -i testsrc=duration=5:size=1920x1080:rate=30 -c:v h264_nvenc -gpu $GPUIndex -preset fast -t 5 test_gpu$GPUIndex.mp4"
+    $testCmd = "ffmpeg -y -hwaccel cuda -hwaccel_device $GPUIndex -f lavfi -i testsrc=duration=10:size=1920x1080:rate=30 -c:v h264_nvenc -gpu $GPUIndex -preset fast test_gpu$GPUIndex.mp4"
     
     try {
-        Write-Host "   Creating test video (5 seconds, 1080p)..." -ForegroundColor Gray
         $startTime = Get-Date
         Invoke-Expression $testCmd *> $null
         $endTime = Get-Date
@@ -165,7 +139,6 @@ if ($ListGPUs) {
     
     if ($gpus.Count -eq 0) {
         Write-Host "❌ No NVIDIA GPUs found" -ForegroundColor Red
-        Write-Host "💡 Make sure NVIDIA drivers are installed and GPUs are properly connected" -ForegroundColor Yellow
         return
     }
     
@@ -175,14 +148,6 @@ if ($ListGPUs) {
         Write-Host "   Free Memory: $($gpu.MemoryFree)MB" -ForegroundColor Green
         Write-Host ('   Utilization: {0}%' -f $gpu.Utilization) -ForegroundColor Gray
         Write-Host "   Temperature: $($gpu.Temperature)°C" -ForegroundColor Gray
-        
-        # Add status indicators
-        if ($gpu.Temperature -gt 80) {
-            Write-Host "   ⚠️  High temperature detected!" -ForegroundColor Red
-        }
-        if ($gpu.MemoryUsedPercent -gt 90) {
-            Write-Host "   ⚠️  High memory usage!" -ForegroundColor Red
-        }
         Write-Host ""
     }
     
@@ -190,31 +155,6 @@ if ($ListGPUs) {
     if ($optimal) {
         Write-Host "🚀 Recommended GPU: GPU $($optimal.Index) ($($optimal.Name))" -ForegroundColor Green
         Write-Host ('   Reason: {0}% utilization, {1}MB free memory' -f $optimal.Utilization, $optimal.MemoryFree) -ForegroundColor Gray
-    }
-    return
-}
-
-if ($TestPerformance) {
-    if ($gpus.Count -eq 0) {
-        Write-Host "❌ No NVIDIA GPUs found for performance testing" -ForegroundColor Red
-        return
-    }
-    
-    Write-Host "🧪 GPU Performance Testing" -ForegroundColor Cyan
-    Write-Host "=" * 40
-    
-    $results = @{}
-    foreach ($gpu in $gpus) {
-        $testTime = Test-GPUPerformance -GPUIndex $gpu.Index
-        $results[$gpu.Index] = $testTime
-    }
-    
-    Write-Host ""
-    Write-Host "📊 Performance Results:" -ForegroundColor Yellow
-    $fastest = $results.GetEnumerator() | Sort-Object Value | Select-Object -First 1
-    foreach ($result in $results.GetEnumerator()) {
-        $status = if ($result.Value -eq $fastest.Value) { "🏆 Fastest" } else { "" }
-        Write-Host "   GPU $($result.Key): $([math]::Round($result.Value, 2))s $status" -ForegroundColor Gray
     }
     return
 }
@@ -230,12 +170,10 @@ if ($GetOptimalConfig) {
     }
     
     $optimal = Get-OptimalGPU -GPUs $gpus
-    $config = Get-FFmpegGPUConfig -GPUIndex $optimal.Index -Profile $Quality
+    $config = Get-FFmpegGPUConfig -GPUIndex $optimal.Index -QualityProfile "balanced"
     
     Write-Host "🎯 Selected GPU: $($optimal.Index) ($($optimal.Name))" -ForegroundColor Green
     Write-Host ('📊 Status: {0}% utilization, {1}MB free' -f $optimal.Utilization, $optimal.MemoryFree) -ForegroundColor Gray
-    Write-Host "🎨 Quality Profile: $Quality" -ForegroundColor Cyan
-    Write-Host "💡 $($config.description)" -ForegroundColor Gray
     Write-Host ""
     Write-Host "🔧 FFmpeg Configuration:" -ForegroundColor Yellow
     Write-Host "   Hardware Acceleration: -hwaccel $($config.hwaccel) -hwaccel_device $($config.hwaccel_device)" -ForegroundColor Cyan
@@ -243,9 +181,6 @@ if ($GetOptimalConfig) {
     Write-Host "   Preset: -preset $($config.preset)" -ForegroundColor Cyan  
     Write-Host "   Quality: -crf $($config.crf)" -ForegroundColor Cyan
     Write-Host "   Additional: $($config.additional)" -ForegroundColor Cyan
-    Write-Host ""
-    Write-Host "📝 Complete Command Example:" -ForegroundColor Yellow
-    Write-Host "ffmpeg -hwaccel $($config.hwaccel) -hwaccel_device $($config.hwaccel_device) -i input.mp4 -c:v $($config.encoder) -preset $($config.preset) -crf $($config.crf) $($config.additional) output.mp4" -ForegroundColor White
     
     return @{
         GPU = $optimal
@@ -266,8 +201,7 @@ if ($TargetGPU -ge 0) {
     Write-Host "🔧 GPU $($targetGpu.Index): $($targetGpu.Name)" -ForegroundColor Yellow
     Write-Host ('📊 Status: {0}% utilization, {1}MB free' -f $targetGpu.Utilization, $targetGpu.MemoryFree) -ForegroundColor Gray
     
-    $config = Get-FFmpegGPUConfig -GPUIndex $TargetGPU -Profile $Quality
-    Write-Host "🎨 Quality Profile: $Quality" -ForegroundColor Cyan
+    $config = Get-FFmpegGPUConfig -GPUIndex $TargetGPU -QualityProfile "balanced"
     Write-Host ""
     Write-Host "🔧 FFmpeg Configuration:" -ForegroundColor Yellow
     Write-Host "   -hwaccel $($config.hwaccel) -hwaccel_device $($config.hwaccel_device) -c:v $($config.encoder) -preset $($config.preset) -crf $($config.crf) $($config.additional)" -ForegroundColor Cyan
@@ -279,22 +213,13 @@ if ($TargetGPU -ge 0) {
 }
 
 # Default: Show summary
-Write-Host "🎮 Enhanced GPU Manager Summary" -ForegroundColor Cyan
-Write-Host "=" * 40
+Write-Host "🎮 GPU Summary" -ForegroundColor Cyan
 Write-Host "Found $($gpus.Count) NVIDIA GPU(s)" -ForegroundColor Green
 
 if ($gpus.Count -gt 0) {
     $optimal = Get-OptimalGPU -GPUs $gpus
-    Write-Host "🚀 Recommended: GPU $($optimal.Index) - $($optimal.Name)" -ForegroundColor Yellow
-    Write-Host ('   Status: {0}% utilization, {1}MB free memory' -f $optimal.Utilization, $optimal.MemoryFree) -ForegroundColor Gray
+    Write-Host "Recommended: GPU $($optimal.Index) - $($optimal.Name)" -ForegroundColor Yellow
     Write-Host ""
-    Write-Host "📋 Available Commands:" -ForegroundColor White
-    Write-Host "   -ListGPUs        : Detailed GPU information" -ForegroundColor Gray
-    Write-Host "   -GetOptimalConfig: FFmpeg configuration" -ForegroundColor Gray
-    Write-Host "   -TestPerformance : Performance testing" -ForegroundColor Gray
-    Write-Host "   -TargetGPU N     : Specific GPU configuration" -ForegroundColor Gray
-    Write-Host "   -Quality profile : fast/balanced/quality" -ForegroundColor Gray
-} else {
-    Write-Host "❌ No NVIDIA GPUs detected" -ForegroundColor Red
-    Write-Host "💡 Check NVIDIA drivers and GPU connections" -ForegroundColor Yellow
+    Write-Host "Use -ListGPUs for detailed information" -ForegroundColor Gray
+    Write-Host "Use -GetOptimalConfig for FFmpeg configuration" -ForegroundColor Gray
 }

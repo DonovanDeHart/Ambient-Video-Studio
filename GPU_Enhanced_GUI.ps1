@@ -218,7 +218,7 @@ function Update-Status {
 }
 
 # Enhanced script runner with GPU support
-function Run-EnhancedScript {
+function Start-EnhancedScript {
     param([string]$videoPath, [string]$audioPath, [int]$hours, [string]$outputPath)
     
     try {
@@ -442,7 +442,7 @@ $createVideoButton.Add_Click({
     }
     
     $outputPath = Join-Path $PSScriptRoot "Output\gpu_ambient_video_$($durationTextBox.Value)hrs.mp4"
-    Run-EnhancedScript $videoTextBox.Text $audioTextBox.Text $durationTextBox.Value $outputPath
+    Start-EnhancedScript $videoTextBox.Text $audioTextBox.Text $durationTextBox.Value $outputPath
 })
 
 # Performance Info Section

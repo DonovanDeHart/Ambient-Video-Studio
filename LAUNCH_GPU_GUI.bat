@@ -13,8 +13,7 @@ powershell.exe -ExecutionPolicy Bypass -WindowStyle Hidden -File "GPU_Enhanced_G
 
 REM If there's an error, show it
 if %ERRORLEVEL% neq 0 (
-    echo.
     echo ❌ Error launching GPU GUI. Trying alternative method...
-    echo.
     powershell.exe -ExecutionPolicy Bypass -File "GPU_Enhanced_GUI.ps1"
     pause
+)
