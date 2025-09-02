@@ -165,46 +165,46 @@ if (-not $SkipValidation) {
 # Calculate target duration in seconds
 $targetSeconds = $DurationHours * 3600
 
-Write-Log "🎬 Ambient Video Creator Starting..." "INFO"
-Write-Log "📹 Video Input: $VideoInput" "INFO"
-Write-Log "🔊 Audio Input: $AudioInput" "INFO"
-Write-Log "⏱️  Target Duration: $DurationHours hours ($targetSeconds seconds)" "INFO"
-Write-Log "📂 Output Path: $OutputPath" "INFO"
+Write-Log "?? Ambient Video Creator Starting..." "INFO"
+Write-Log "?? Video Input: $VideoInput" "INFO"
+Write-Log "?? Audio Input: $AudioInput" "INFO"
+Write-Log "??  Target Duration: $DurationHours hours ($targetSeconds seconds)" "INFO"
+Write-Log "?? Output Path: $OutputPath" "INFO"
 
 # Get media information
-Write-Log "📊 Analyzing input files..." "INFO"
+Write-Log "?? Analyzing input files..." "INFO"
 $videoInfo = Get-MediaInfo -FilePath $VideoInput
 $audioInfo = Get-MediaInfo -FilePath $AudioInput
 
 if ($videoInfo) {
-    Write-Log "📹 Video duration: $([math]::Round($videoInfo.Duration, 2)) seconds" "INFO"
-    Write-Log "📹 Video resolution: $($videoInfo.Resolution)" "INFO"
+    Write-Log "?? Video duration: $([math]::Round($videoInfo.Duration, 2)) seconds" "INFO"
+    Write-Log "?? Video resolution: $($videoInfo.Resolution)" "INFO"
 } else {
-    Write-Log "⚠️ Could not analyze video file" "WARNING"
+    Write-Log "?? Could not analyze video file" "WARNING"
 }
 
 if ($audioInfo) {
-    Write-Log "🔊 Audio duration: $([math]::Round($audioInfo.Duration, 2)) seconds" "INFO"
-    Write-Log "🔊 Audio info: $($audioInfo.Audio)" "INFO"
+    Write-Log "?? Audio duration: $([math]::Round($audioInfo.Duration, 2)) seconds" "INFO"
+    Write-Log "?? Audio info: $($audioInfo.Audio)" "INFO"
 } else {
-    Write-Log "⚠️ Could not analyze audio file" "WARNING"
+    Write-Log "?? Could not analyze audio file" "WARNING"
 }
 
 # Calculate loop counts
 $videoLoops = [math]::Ceiling($targetSeconds / $videoInfo.Duration)
 $audioLoops = [math]::Ceiling($targetSeconds / $audioInfo.Duration)
 
-Write-Log "🔄 Video loops needed: $videoLoops" "INFO"
-Write-Log "🔄 Audio loops needed: $audioLoops" "INFO"
+Write-Log "?? Video loops needed: $videoLoops" "INFO"
+Write-Log "?? Audio loops needed: $audioLoops" "INFO"
 
 # Create temporary directory
-$tempDir = "temp_ambient_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+$tempDir = "temp_ambient_$(Get-Date -Format "yyyyMMdd_HHmmss")"
 New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
-Write-Log "📁 Created temporary directory: $tempDir" "INFO"
+Write-Log "?? Created temporary directory: $tempDir" "INFO"
 
 try {
     # Create seamless video loop
-    Write-Log "🎬 Creating seamless video loop..." "INFO"
+    Write-Log "?? Creating seamless video loop..." "INFO"
     $videoLoopPath = Join-Path $tempDir "temp_video_loop.mp4"
     
     $videoLoopCmd = Optimize-FFmpegCommand -InputPath $VideoInput -OutputPath $videoLoopPath -Duration $targetSeconds -Type "video"
@@ -222,10 +222,10 @@ try {
         throw "Video loop file was not created"
     }
     
-    Write-Log "✅ Video loop created successfully" "INFO"
+    Write-Log "? Video loop created successfully" "INFO"
     
     # Create seamless audio loop
-    Write-Log "🔊 Creating seamless audio loop..." "INFO"
+    Write-Log "?? Creating seamless audio loop..." "INFO"
     $audioLoopPath = Join-Path $tempDir "temp_audio_loop.wav"
     
     $audioLoopCmd = Optimize-FFmpegCommand -InputPath $AudioInput -OutputPath $audioLoopPath -Duration $targetSeconds -Type "audio"
@@ -243,10 +243,10 @@ try {
         throw "Audio loop file was not created"
     }
     
-    Write-Log "✅ Audio loop created successfully" "INFO"
+    Write-Log "? Audio loop created successfully" "INFO"
     
     # Combine video and audio
-    Write-Log "🎯 Combining video and audio..." "INFO"
+    Write-Log "?? Combining video and audio..." "INFO"
     $finalOutput = Join-Path $tempDir "temp_final.mp4"
     
     $combineCmd = Optimize-FFmpegCommand -InputPath $videoLoopPath -OutputPath $finalOutput -Duration $targetSeconds -Type "combine"
@@ -268,7 +268,7 @@ try {
         }
         
         Move-Item -Path $finalOutput -Destination $OutputPath -Force
-        Write-Log "✅ Final video moved to: $OutputPath" "INFO"
+        Write-Log "? Final video moved to: $OutputPath" "INFO"
     } else {
         throw "Final output file was not created"
     }
@@ -278,14 +278,14 @@ try {
         $outputSize = [math]::Round((Get-Item $OutputPath).Length / 1MB, 2)
         $outputDuration = Get-MediaInfo -FilePath $OutputPath
         
-        Write-Log "🎉 SUCCESS! Ambient video created successfully" "INFO"
-        Write-Log "📁 Output file: $OutputPath" "INFO"
-        Write-Log "📏 File size: ${outputSize} MB" "INFO"
-        Write-Log "⏱️ Duration: $DurationHours hours" "INFO"
+        Write-Log "?? SUCCESS! Ambient video created successfully" "INFO"
+        Write-Log "?? Output file: $OutputPath" "INFO"
+        Write-Log "?? File size: ${outputSize} MB" "INFO"
+        Write-Log "?? Duration: $DurationHours hours" "INFO"
         if ($outputDuration) {
-            Write-Log "⏱️ Actual duration: $([math]::Round($outputDuration.Duration / 3600, 2)) hours" "INFO"
+            Write-Log "?? Actual duration: $([math]::Round($outputDuration.Duration / 3600, 2)) hours" "INFO"
         }
-        Write-Log "🚀 Your ambient video is ready for YouTube!" "INFO"
+        Write-Log "?? Your ambient video is ready for YouTube!" "INFO"
         
         # Create metadata file
         $metadata = @{
@@ -300,27 +300,27 @@ try {
             ProcessingTime = (Get-Date) - (Get-Date).AddSeconds(-$DurationHours)
         }
         
-        $metadataPath = $OutputPath -replace '\.mp4$', '_metadata.json'
+        $metadataPath = $OutputPath -replace "\.mp4$", "_metadata.json"
         $metadata | ConvertTo-Json | Set-Content $metadataPath
-        Write-Log "📝 Metadata saved to: $metadataPath" "INFO"
+        Write-Log "?? Metadata saved to: $metadataPath" "INFO"
         
     } else {
         throw "Final output file validation failed"
     }
     
 } catch {
-    Write-Log "❌ Error during processing: $($_.Exception.Message)" "ERROR"
-    Write-Error "❌ Processing failed: $($_.Exception.Message)"
+    Write-Log "? Error during processing: $($_.Exception.Message)" "ERROR"
+    Write-Error "? Processing failed: $($_.Exception.Message)"
 } finally {
     # Cleanup temporary files
-    Write-Log "🧹 Cleaning up temporary files..." "INFO"
+    Write-Log "?? Cleaning up temporary files..." "INFO"
     try {
         if (Test-Path $tempDir) {
             Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
-            Write-Log "✅ Temporary files cleaned up" "INFO"
+            Write-Log "? Temporary files cleaned up" "INFO"
         }
     } catch {
-        Write-Log "⚠️ Failed to clean up temporary files: $($_.Exception.Message)" "WARNING"
+        Write-Log "?? Failed to clean up temporary files: $($_.Exception.Message)" "WARNING"
     }
 }
 

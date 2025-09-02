@@ -13,7 +13,7 @@ $global:LogBuffer = @()
 
 # Main Form
 $form = New-Object System.Windows.Forms.Form
-$form.Text = "🎬 Ambient Video Studio - Enhanced"
+$form.Text = "?? Ambient Video Studio - Enhanced"
 $form.Size = New-Object System.Drawing.Size(1000, 800)
 $form.StartPosition = "CenterScreen"
 $form.BackColor = [System.Drawing.Color]::FromArgb(45, 45, 48)
@@ -24,7 +24,7 @@ $form.MinimizeBox = $false
 
 # Title Label
 $titleLabel = New-Object System.Windows.Forms.Label
-$titleLabel.Text = "🎬 Ambient Video Studio"
+$titleLabel.Text = "?? Ambient Video Studio"
 $titleLabel.Font = New-Object System.Drawing.Font("Segoe UI", 20, [System.Drawing.FontStyle]::Bold)
 $titleLabel.ForeColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
 $titleLabel.Location = New-Object System.Drawing.Point(20, 20)
@@ -114,19 +114,19 @@ function Update-Status {
 }
 
 # Enhanced script runner with progress tracking
-function Run-Script {
+function Invoke-Script {
     param([string]$scriptPath, [string[]]$arguments = @(), [string]$description = "")
     
     try {
         $fullPath = Join-Path $PSScriptRoot "Tools\$scriptPath"
         
         if (-not (Test-Path $fullPath)) {
-            Update-Status "❌ Script not found: $scriptPath" "Red"
+            Update-Status "? Script not found: $scriptPath" "Red"
             return
         }
         
         $desc = if ($description) { $description } else { $scriptPath }
-        Update-Status "🔄 Running $desc..." "Yellow", 10
+        Update-Status "?? Running $desc..." "Yellow", 10
         $progressBar.Style = "Marquee"
         
         # Start process with progress tracking
@@ -147,9 +147,9 @@ function Run-Script {
                 $progressBar.Style = "Continuous"
                 
                 if ($global:CurrentProcess.ExitCode -eq 0) {
-                    Update-Status "✅ $desc completed successfully" "LimeGreen", 100
+                    Update-Status "? $desc completed successfully" "LimeGreen", 100
                 } else {
-                    Update-Status "⚠️ $desc finished with warnings" "Orange", 100
+                    Update-Status "?? $desc finished with warnings" "Orange", 100
                 }
                 
                 $global:CurrentProcess = $null
@@ -159,7 +159,7 @@ function Run-Script {
         
     } catch {
         $progressBar.Style = "Continuous"
-        Update-Status "❌ Error running $desc`: $($_.Exception.Message)" "Red"
+        Update-Status "? Error running $desc`: $($_.Exception.Message)" "Red"
     }
 }
 
@@ -185,17 +185,17 @@ function Enable-DragAndDrop {
                 "video" {
                     if ($extension -in @(".mp4", ".mov", ".avi", ".mkv")) {
                         $videoTextBox.Text = $file
-                        Update-Status "📹 Video file loaded: $([System.IO.Path]::GetFileName($file))" "Cyan"
+                        Update-Status "?? Video file loaded: $([System.IO.Path]::GetFileName($file))" "Cyan"
                     } else {
-                        Update-Status "❌ Invalid video file format" "Red"
+                        Update-Status "? Invalid video file format" "Red"
                     }
                 }
                 "audio" {
                     if ($extension -in @(".wav", ".mp3", ".flac", ".aac")) {
                         $audioTextBox.Text = $file
-                        Update-Status "🔊 Audio file loaded: $([System.IO.Path]::GetFileName($file))" "Cyan"
+                        Update-Status "?? Audio file loaded: $([System.IO.Path]::GetFileName($file))" "Cyan"
                     } else {
-                        Update-Status "❌ Invalid audio file format" "Red"
+                        Update-Status "? Invalid audio file format" "Red"
                     }
                 }
             }
@@ -205,7 +205,7 @@ function Enable-DragAndDrop {
 
 # === QUICK START SECTION ===
 $quickStartGroup = New-Object System.Windows.Forms.GroupBox
-$quickStartGroup.Text = "🚀 Quick Start"
+$quickStartGroup.Text = "?? Quick Start"
 $quickStartGroup.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
 $quickStartGroup.ForeColor = [System.Drawing.Color]::White
 $quickStartGroup.Location = New-Object System.Drawing.Point(20, 130)
@@ -226,7 +226,7 @@ $videoTextBox.Location = New-Object System.Drawing.Point(100, 28)
 $videoTextBox.Size = New-Object System.Drawing.Size(500, 23)
 $videoTextBox.BackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
 $videoTextBox.ForeColor = [System.Drawing.Color]::White
-$videoTextBox.PlaceholderText = "Drag & drop video file here or click Browse..."
+$videoTextBox.PlaceholderText = "Drag and drop video file here or click Browse..."
 $quickStartGroup.Controls.Add($videoTextBox)
 
 $videoBrowseButton = New-Object System.Windows.Forms.Button
@@ -245,7 +245,7 @@ $videoBrowseButton.Add_Click({
     
     if ($openFileDialog.ShowDialog() -eq "OK") {
         $videoTextBox.Text = $openFileDialog.FileName
-        Update-Status "📹 Video file selected: $([System.IO.Path]::GetFileName($openFileDialog.FileName))" "Cyan"
+        Update-Status "?? Video file selected: $([System.IO.Path]::GetFileName($openFileDialog.FileName))" "Cyan"
     }
 })
 
@@ -263,7 +263,7 @@ $audioTextBox.Location = New-Object System.Drawing.Point(100, 63)
 $audioTextBox.Size = New-Object System.Drawing.Size(500, 23)
 $audioTextBox.BackColor = [System.Drawing.Color]::FromArgb(60, 60, 60)
 $audioTextBox.ForeColor = [System.Drawing.Color]::White
-$audioTextBox.PlaceholderText = "Drag & drop audio file here or click Browse..."
+$audioTextBox.PlaceholderText = "Drag and drop audio file here or click Browse..."
 $quickStartGroup.Controls.Add($audioTextBox)
 
 $audioBrowseButton = New-Object System.Windows.Forms.Button
@@ -282,7 +282,7 @@ $audioBrowseButton.Add_Click({
     
     if ($openFileDialog.ShowDialog() -eq "OK") {
         $audioTextBox.Text = $openFileDialog.FileName
-        Update-Status "🔊 Audio file selected: $([System.IO.Path]::GetFileName($openFileDialog.FileName))" "Cyan"
+        Update-Status "?? Audio file selected: $([System.IO.Path]::GetFileName($openFileDialog.FileName))" "Cyan"
     }
 })
 
@@ -307,7 +307,7 @@ $quickStartGroup.Controls.Add($durationTextBox)
 
 # Create Video Button
 $createVideoButton = New-Object System.Windows.Forms.Button
-$createVideoButton.Text = "🎬 CREATE AMBIENT VIDEO"
+$createVideoButton.Text = "?? CREATE AMBIENT VIDEO"
 $createVideoButton.Font = New-Object System.Drawing.Font("Segoe UI", 12, [System.Drawing.FontStyle]::Bold)
 $createVideoButton.Location = New-Object System.Drawing.Point(700, 55)
 $createVideoButton.Size = New-Object System.Drawing.Size(220, 35)
@@ -318,12 +318,12 @@ $quickStartGroup.Controls.Add($createVideoButton)
 
 $createVideoButton.Add_Click({
     if (-not $videoTextBox.Text -or -not $audioTextBox.Text) {
-        Update-Status "❌ Please select both video and audio files" "Red"
+        Update-Status "? Please select both video and audio files" "Red"
         return
     }
     
     if (-not (Test-Path $videoTextBox.Text) -or -not (Test-Path $audioTextBox.Text)) {
-        Update-Status "❌ One or both files don't exist" "Red"
+        Update-Status "? One or both files don't exist" "Red"
         return
     }
     
@@ -336,7 +336,7 @@ $createVideoButton.Add_Click({
         "-Verbose"
     )
     
-    Run-Script "ambient_video_creator.ps1" $arguments "Creating $($durationTextBox.Value)-hour ambient video"
+    Invoke-Script "ambient_video_creator.ps1" $arguments "Creating $($durationTextBox.Value)-hour ambient video"
 })
 
 # Enable drag and drop for video and audio textboxes
@@ -345,7 +345,7 @@ Enable-DragAndDrop -control $audioTextBox -fileType "audio"
 
 # === CONTENT RESEARCH SECTION ===
 $researchGroup = New-Object System.Windows.Forms.GroupBox
-$researchGroup.Text = "🔍 Content Research & Sourcing"
+$researchGroup.Text = "?? Content Research & Sourcing"
 $researchGroup.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
 $researchGroup.ForeColor = [System.Drawing.Color]::White
 $researchGroup.Location = New-Object System.Drawing.Point(20, 290)
@@ -373,7 +373,7 @@ $researchGroup.Controls.Add($themeComboBox)
 
 # Research Buttons
 $researchButton = New-Object System.Windows.Forms.Button
-$researchButton.Text = "🔍 Research Content Ideas"
+$researchButton.Text = "?? Research Content Ideas"
 $researchButton.Location = New-Object System.Drawing.Point(180, 27)
 $researchButton.Size = New-Object System.Drawing.Size(170, 25)
 $researchButton.BackColor = [System.Drawing.Color]::FromArgb(156, 39, 176)
@@ -383,11 +383,11 @@ $researchGroup.Controls.Add($researchButton)
 
 $researchButton.Add_Click({
     $arguments = @("-Theme", $themeComboBox.SelectedItem, "-VideoCount", "10", "-AudioCount", "5")
-    Run-Script "content_sourcer.ps1" $arguments "Researching $($themeComboBox.SelectedItem) content ideas"
+    Invoke-Script "content_sourcer.ps1" $arguments "Researching $($themeComboBox.SelectedItem) content ideas"
 })
 
 $generateAudioButton = New-Object System.Windows.Forms.Button
-$generateAudioButton.Text = "🎵 Generate AI Audio"
+$generateAudioButton.Text = "?? Generate AI Audio"
 $generateAudioButton.Location = New-Object System.Drawing.Point(360, 27)
 $generateAudioButton.Size = New-Object System.Drawing.Size(150, 25)
 $generateAudioButton.BackColor = [System.Drawing.Color]::FromArgb(255, 152, 0)
@@ -397,11 +397,11 @@ $researchGroup.Controls.Add($generateAudioButton)
 
 $generateAudioButton.Add_Click({
     $arguments = @("-Theme", $themeComboBox.SelectedItem, "-Service", $serviceComboBox.SelectedItem, "-Duration", "600")
-    Run-Script "ai_audio_generator.ps1" $arguments "Generating AI audio for $($themeComboBox.SelectedItem) theme"
+    Invoke-Script "ai_audio_generator.ps1" $arguments "Generating AI audio for $($themeComboBox.SelectedItem) theme"
 })
 
 $downloadVideoButton = New-Object System.Windows.Forms.Button
-$downloadVideoButton.Text = "⬇️ Find Video Sources"
+$downloadVideoButton.Text = "?? Find Video Sources"
 $downloadVideoButton.Location = New-Object System.Drawing.Point(520, 27)
 $downloadVideoButton.Size = New-Object System.Drawing.Size(150, 25)
 $downloadVideoButton.BackColor = [System.Drawing.Color]::FromArgb(63, 81, 181)
@@ -413,9 +413,9 @@ $downloadVideoButton.Add_Click({
     $pixabayUrl = "https://pixabay.com/videos/search/$($themeComboBox.SelectedItem)/"
     try {
         Start-Process $pixabayUrl
-        Update-Status "🌐 Opened Pixabay search for '$($themeComboBox.SelectedItem)' videos" "Cyan"
+        Update-Status "?? Opened Pixabay search for '$($themeComboBox.SelectedItem)' videos" "Cyan"
     } catch {
-        Update-Status "❌ Failed to open browser" "Red"
+        Update-Status "? Failed to open browser" "Red"
     }
 })
 
@@ -440,7 +440,7 @@ $researchGroup.Controls.Add($serviceComboBox)
 
 # Show Prompts Button
 $showPromptsButton = New-Object System.Windows.Forms.Button
-$showPromptsButton.Text = "📝 Show Audio Prompts"
+$showPromptsButton.Text = "?? Show Audio Prompts"
 $showPromptsButton.Location = New-Object System.Drawing.Point(220, 62)
 $showPromptsButton.Size = New-Object System.Drawing.Size(160, 25)
 $showPromptsButton.BackColor = [System.Drawing.Color]::FromArgb(96, 125, 139)
@@ -449,12 +449,12 @@ $showPromptsButton.FlatStyle = "Flat"
 $researchGroup.Controls.Add($showPromptsButton)
 
 $showPromptsButton.Add_Click({
-    Run-Script "ai_audio_generator.ps1" @("-ListPrompts") "Listing audio prompts"
+    Invoke-Script "ai_audio_generator.ps1" @("-ListPrompts") "Listing audio prompts"
 })
 
 # === ADVANCED TOOLS SECTION ===
 $advancedGroup = New-Object System.Windows.Forms.GroupBox
-$advancedGroup.Text = "🛠️ Advanced Tools"
+$advancedGroup.Text = "??? Advanced Tools"
 $advancedGroup.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
 $advancedGroup.ForeColor = [System.Drawing.Color]::White
 $advancedGroup.Location = New-Object System.Drawing.Point(20, 450)
@@ -463,7 +463,7 @@ $form.Controls.Add($advancedGroup)
 
 # Audio Optimizer
 $optimizeAudioButton = New-Object System.Windows.Forms.Button
-$optimizeAudioButton.Text = "🔧 Optimize Audio Loop"
+$optimizeAudioButton.Text = "?? Optimize Audio Loop"
 $optimizeAudioButton.Location = New-Object System.Drawing.Point(20, 30)
 $optimizeAudioButton.Size = New-Object System.Drawing.Size(160, 30)
 $optimizeAudioButton.BackColor = [System.Drawing.Color]::FromArgb(121, 85, 72)
@@ -473,17 +473,17 @@ $advancedGroup.Controls.Add($optimizeAudioButton)
 
 $optimizeAudioButton.Add_Click({
     if (-not $audioTextBox.Text) {
-        Update-Status "❌ Please select an audio file first" "Red"
+        Update-Status "? Please select an audio file first" "Red"
         return
     }
     
     $arguments = @("-InputAudio", "`"$($audioTextBox.Text)`"", "-RemoveNoise", "-Normalize")
-    Run-Script "audio_loop_optimizer.ps1" $arguments "Optimizing audio loop"
+    Invoke-Script "audio_loop_optimizer.ps1" $arguments "Optimizing audio loop"
 })
 
 # Batch Creator
 $batchButton = New-Object System.Windows.Forms.Button
-$batchButton.Text = "📦 Batch Create Videos"
+$batchButton.Text = "?? Batch Create Videos"
 $batchButton.Location = New-Object System.Drawing.Point(190, 30)
 $batchButton.Size = New-Object System.Drawing.Size(160, 30)
 $batchButton.BackColor = [System.Drawing.Color]::FromArgb(103, 58, 183)
@@ -494,16 +494,16 @@ $advancedGroup.Controls.Add($batchButton)
 $batchButton.Add_Click({
     $configFile = Join-Path $PSScriptRoot "Projects\ambient_config.json"
     if (-not (Test-Path $configFile)) {
-        Update-Status "❌ No batch configuration found. Creating example..." "Orange"
-        Run-Script "batch_ambient_creator.ps1" @("-ConfigFile", "`"$configFile`"") "Creating batch configuration"
+        Update-Status "? No batch configuration found. Creating example..." "Orange"
+        Invoke-Script "batch_ambient_creator.ps1" @("-ConfigFile", "`"$configFile`"") "Creating batch configuration"
     } else {
-        Run-Script "batch_ambient_creator.ps1" @("-ConfigFile", "`"$configFile`"") "Processing batch videos"
+        Invoke-Script "batch_ambient_creator.ps1" @("-ConfigFile", "`"$configFile`"") "Processing batch videos"
     }
 })
 
 # Open Folders Buttons
 $sourceFolderButton = New-Object System.Windows.Forms.Button
-$sourceFolderButton.Text = "📁 Open Source Files"
+$sourceFolderButton.Text = "?? Open Source Files"
 $sourceFolderButton.Location = New-Object System.Drawing.Point(360, 30)
 $sourceFolderButton.Size = New-Object System.Drawing.Size(140, 30)
 $sourceFolderButton.BackColor = [System.Drawing.Color]::FromArgb(69, 90, 100)
@@ -515,16 +515,16 @@ $sourceFolderButton.Add_Click({
     $sourceFolder = Join-Path $PSScriptRoot "Source-Files"
     if (Test-Path $sourceFolder) {
         Start-Process "explorer.exe" $sourceFolder
-        Update-Status "📁 Opened Source Files folder" "Cyan"
+        Update-Status "?? Opened Source Files folder" "Cyan"
     } else {
         New-Item -ItemType Directory -Path $sourceFolder -Force | Out-Null
         Start-Process "explorer.exe" $sourceFolder
-        Update-Status "📁 Created and opened Source Files folder" "Cyan"
+        Update-Status "?? Created and opened Source Files folder" "Cyan"
     }
 })
 
 $outputFolderButton = New-Object System.Windows.Forms.Button
-$outputFolderButton.Text = "📁 Open Output Folder"
+$outputFolderButton.Text = "?? Open Output Folder"
 $outputFolderButton.Location = New-Object System.Drawing.Point(510, 30)
 $outputFolderButton.Size = New-Object System.Drawing.Size(140, 30)
 $outputFolderButton.BackColor = [System.Drawing.Color]::FromArgb(69, 90, 100)
@@ -536,17 +536,17 @@ $outputFolderButton.Add_Click({
     $outputFolder = Join-Path $PSScriptRoot "Output"
     if (Test-Path $outputFolder) {
         Start-Process "explorer.exe" $outputFolder
-        Update-Status "📁 Opened Output folder" "Cyan"
+        Update-Status "?? Opened Output folder" "Cyan"
     } else {
         New-Item -ItemType Directory -Path $outputFolder -Force | Out-Null
         Start-Process "explorer.exe" $outputFolder
-        Update-Status "📁 Created and opened Output folder" "Cyan"
+        Update-Status "?? Created and opened Output folder" "Cyan"
     }
 })
 
 # Help Button
 $helpButton = New-Object System.Windows.Forms.Button
-$helpButton.Text = "❓ Help & Guides"
+$helpButton.Text = "? Help & Guides"
 $helpButton.Location = New-Object System.Drawing.Point(660, 30)
 $helpButton.Size = New-Object System.Drawing.Size(120, 30)
 $helpButton.BackColor = [System.Drawing.Color]::FromArgb(158, 158, 158)
@@ -564,12 +564,12 @@ $helpButton.Add_Click({
     if (Test-Path $contentGuide) {
         Start-Process "notepad.exe" $contentGuide  
     }
-    Update-Status "📖 Opened documentation files" "Cyan"
+    Update-Status "?? Opened documentation files" "Cyan"
 })
 
 # === QUICK ACTIONS SECTION ===
 $quickActionsGroup = New-Object System.Windows.Forms.GroupBox
-$quickActionsGroup.Text = "⚡ Quick Actions"
+$quickActionsGroup.Text = "? Quick Actions"
 $quickActionsGroup.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
 $quickActionsGroup.ForeColor = [System.Drawing.Color]::White
 $quickActionsGroup.Location = New-Object System.Drawing.Point(20, 590)
@@ -578,7 +578,7 @@ $form.Controls.Add($quickActionsGroup)
 
 # Research Rain Content
 $rainButton = New-Object System.Windows.Forms.Button
-$rainButton.Text = "🌧️ Research Rain Content"
+$rainButton.Text = "??? Research Rain Content"
 $rainButton.Location = New-Object System.Drawing.Point(20, 30)
 $rainButton.Size = New-Object System.Drawing.Size(160, 25)
 $rainButton.BackColor = [System.Drawing.Color]::FromArgb(33, 150, 243)
@@ -588,12 +588,12 @@ $quickActionsGroup.Controls.Add($rainButton)
 
 $rainButton.Add_Click({
     $arguments = @("-Theme", "rain", "-VideoCount", "10", "-AudioCount", "5")
-    Run-Script "content_sourcer.ps1" $arguments "Researching rain content"
+    Invoke-Script "content_sourcer.ps1" $arguments "Researching rain content"
 })
 
 # Research Fire Content
 $fireButton = New-Object System.Windows.Forms.Button
-$fireButton.Text = "🔥 Research Fire Content"
+$fireButton.Text = "?? Research Fire Content"
 $fireButton.Location = New-Object System.Drawing.Point(190, 30)
 $fireButton.Size = New-Object System.Drawing.Size(160, 25)
 $fireButton.BackColor = [System.Drawing.Color]::FromArgb(244, 67, 54)
@@ -603,12 +603,12 @@ $quickActionsGroup.Controls.Add($fireButton)
 
 $fireButton.Add_Click({
     $arguments = @("-Theme", "fire", "-VideoCount", "10", "-AudioCount", "5")
-    Run-Script "content_sourcer.ps1" $arguments "Researching fire content"
+    Invoke-Script "content_sourcer.ps1" $arguments "Researching fire content"
 })
 
 # Open Pixabay
 $pixabayButton = New-Object System.Windows.Forms.Button
-$pixabayButton.Text = "🎬 Open Pixabay Videos"
+$pixabayButton.Text = "?? Open Pixabay Videos"
 $pixabayButton.Location = New-Object System.Drawing.Point(360, 30)
 $pixabayButton.Size = New-Object System.Drawing.Size(160, 25)
 $pixabayButton.BackColor = [System.Drawing.Color]::FromArgb(76, 175, 80)
@@ -619,15 +619,15 @@ $quickActionsGroup.Controls.Add($pixabayButton)
 $pixabayButton.Add_Click({
     try {
         Start-Process "https://pixabay.com/videos/search/ambient/"
-        Update-Status "🌐 Opened Pixabay ambient videos" "Cyan"
+        Update-Status "?? Opened Pixabay ambient videos" "Cyan"
     } catch {
-        Update-Status "❌ Failed to open browser" "Red"
+        Update-Status "? Failed to open browser" "Red"
     }
 })
 
 # Open ElevenLabs
 $elevenlabsButton = New-Object System.Windows.Forms.Button
-$elevenlabsButton.Text = "🎵 Open ElevenLabs AI Audio"
+$elevenlabsButton.Text = "?? Open ElevenLabs AI Audio"
 $elevenlabsButton.Location = New-Object System.Drawing.Point(530, 30)
 $elevenlabsButton.Size = New-Object System.Drawing.Size(180, 25)
 $elevenlabsButton.BackColor = [System.Drawing.Color]::FromArgb(255, 152, 0)
@@ -638,16 +638,16 @@ $quickActionsGroup.Controls.Add($elevenlabsButton)
 $elevenlabsButton.Add_Click({
     try {
         Start-Process "https://elevenlabs.io/sound-effects"
-        Update-Status "🌐 Opened ElevenLabs sound effects generator" "Cyan"
+        Update-Status "?? Opened ElevenLabs sound effects generator" "Cyan"
     } catch {
-        Update-Status "❌ Failed to open browser" "Red"
+        Update-Status "? Failed to open browser" "Red"
     }
 })
 
 # Update generate audio button to use selected service
 $generateAudioButton.Add_Click({
     $arguments = @("-Theme", $themeComboBox.SelectedItem, "-Service", $serviceComboBox.SelectedItem, "-Duration", "600")
-    Run-Script "ai_audio_generator.ps1" $arguments "Generating AI audio for $($themeComboBox.SelectedItem) theme"
+    Invoke-Script "ai_audio_generator.ps1" $arguments "Generating AI audio for $($themeComboBox.SelectedItem) theme"
 })
 
 # Form closing event
@@ -661,5 +661,5 @@ $form.Add_FormClosing({
 })
 
 # Show the form
-Update-Status "🚀 Ambient Video Studio Enhanced v2.0 loaded - Ready to create!" "LimeGreen"
+Update-Status "?? Ambient Video Studio Enhanced v2.0 loaded - Ready to create!" "LimeGreen"
 [void]$form.ShowDialog()

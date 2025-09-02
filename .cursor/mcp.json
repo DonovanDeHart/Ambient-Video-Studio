@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "@firecrawl/mcp-server"],
+      "env": {
+        "FIRECRAWL_API_KEY": "your_firecrawl_api_key_here"
+      }
+    },
+    "taskmaster-todoist": {
+      "command": "npx",
+      "args": ["-y", "@mingolladaniele/taskmaster-todoist-mcp"],
+      "env": {
+        "TODOIST_API_TOKEN": "your_todoist_token_here"
+      }
+    },
+    "magic": {
+      "command": "npx",
+      "args": ["-y", "@21st/magic-mcp"],
+      "env": {
+        "OPENAI_API_KEY": "your_openai_api_key_here"
+      }
+    }
+  }
+}

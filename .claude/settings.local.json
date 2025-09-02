@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo create:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(where mcp)",
+      "Read(C:\\Users\\Dehar\\AppData\\Roaming\\Claude/**)",
+      "WebSearch",
+      "WebFetch(domain:www.firecrawl.dev)",
+      "WebFetch(domain:upstash.com)",
+      "Read(C:\\Users\\Dehar\\AppData\\Roaming\\Claude/**)",
+      "Bash(npx:*)",
+      "Bash(uvx:*)",
+      "mcp__fetch__imageFetch",
+      "Bash(powershell.exe:*)",
+      "Bash(where:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(powershell:*)",
+      "Bash(find:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
