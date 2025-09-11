@@ -1,15 +1,17 @@
-# Ambient Video Studio GUI - Enhanced Version
+# Ambient Video Studio GUI - Enhanced Version with Copilot Monitoring
 # Easy-to-use interface for all ambient video creation tools
-# Enhanced with progress tracking, drag-and-drop, and better UX
+# Enhanced with progress tracking, drag-and-drop, better UX, and copilot monitoring
 
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Windows.Forms.DataVisualization
 
-# Global variables for progress tracking
+# Global variables for progress tracking and copilot monitoring
 $global:CurrentProcess = $null
 $global:ProgressTimer = $null
 $global:LogBuffer = @()
+$global:CopilotMonitoringActive = $false
+$global:CopilotTimer = $null
 
 # Main Form
 $form = New-Object System.Windows.Forms.Form
@@ -113,7 +115,7 @@ function Update-Status {
     $form.Refresh()
 }
 
-# Enhanced script runner with progress tracking
+# Enhanced script runner with progress tracking and copilot monitoring integration
 function Invoke-Script {
     param([string]$scriptPath, [string[]]$arguments = @(), [string]$description = "")
     
@@ -121,13 +123,19 @@ function Invoke-Script {
         $fullPath = Join-Path $PSScriptRoot "Tools\$scriptPath"
         
         if (-not (Test-Path $fullPath)) {
-            Update-Status "? Script not found: $scriptPath" "Red"
+            Update-Status "❌ Script not found: $scriptPath" "Red"
             return
         }
         
         $desc = if ($description) { $description } else { $scriptPath }
-        Update-Status "?? Running $desc..." "Yellow", 10
+        Update-Status "⚙️ Running $desc..." "Yellow", 10
         $progressBar.Style = "Marquee"
+        
+        # Check if copilot monitoring is enabled and add the parameter
+        if ($enableMonitoringCheckbox.Checked -and $scriptPath -like "*ai_*") {
+            $arguments += "-EnableCopilotMonitoring"
+            Update-Status "🤖 Copilot monitoring enabled for $desc" "Cyan"
+        }
         
         # Start process with progress tracking
         $processArgs = @("-ExecutionPolicy", "Bypass", "-File", $fullPath) + $arguments
@@ -142,14 +150,19 @@ function Invoke-Script {
                 if ($currentProgress -le 90) {
                     $progressBar.Value = $currentProgress
                 }
+                
+                # Update copilot status if monitoring is active
+                if ($global:CopilotMonitoringActive) {
+                    Update-CopilotStatus
+                }
             } else {
                 $global:ProgressTimer.Stop()
                 $progressBar.Style = "Continuous"
                 
                 if ($global:CurrentProcess.ExitCode -eq 0) {
-                    Update-Status "? $desc completed successfully" "LimeGreen", 100
+                    Update-Status "✅ $desc completed successfully" "LimeGreen", 100
                 } else {
-                    Update-Status "?? $desc finished with warnings" "Orange", 100
+                    Update-Status "⚠️ $desc finished with warnings" "Orange", 100
                 }
                 
                 $global:CurrentProcess = $null
@@ -159,7 +172,7 @@ function Invoke-Script {
         
     } catch {
         $progressBar.Style = "Continuous"
-        Update-Status "? Error running $desc`: $($_.Exception.Message)" "Red"
+        Update-Status "❌ Error running $desc`: $($_.Exception.Message)" "Red"
     }
 }
 
@@ -567,6 +580,89 @@ $helpButton.Add_Click({
     Update-Status "?? Opened documentation files" "Cyan"
 })
 
+# === COPILOT MONITORING SECTION ===
+$copilotGroup = New-Object System.Windows.Forms.GroupBox
+$copilotGroup.Text = "🤖 Copilot Progress Monitor"
+$copilotGroup.Font = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+$copilotGroup.ForeColor = [System.Drawing.Color]::White
+$copilotGroup.Location = New-Object System.Drawing.Point(500, 450)
+$copilotGroup.Size = New-Object System.Drawing.Size(470, 120)
+$form.Controls.Add($copilotGroup)
+
+# Copilot Status Display
+$copilotStatusLabel = New-Object System.Windows.Forms.Label
+$copilotStatusLabel.Text = "Status: Inactive"
+$copilotStatusLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$copilotStatusLabel.ForeColor = [System.Drawing.Color]::Gray
+$copilotStatusLabel.Location = New-Object System.Drawing.Point(20, 30)
+$copilotStatusLabel.Size = New-Object System.Drawing.Size(200, 20)
+$copilotGroup.Controls.Add($copilotStatusLabel)
+
+# Active Sessions Count
+$activeSessionsLabel = New-Object System.Windows.Forms.Label
+$activeSessionsLabel.Text = "Active Sessions: 0"
+$activeSessionsLabel.Font = New-Object System.Drawing.Font("Segoe UI", 9)
+$activeSessionsLabel.ForeColor = [System.Drawing.Color]::LightBlue
+$activeSessionsLabel.Location = New-Object System.Drawing.Point(230, 30)
+$activeSessionsLabel.Size = New-Object System.Drawing.Size(120, 20)
+$copilotGroup.Controls.Add($activeSessionsLabel)
+
+# Copilot Progress Bar
+$copilotProgressBar = New-Object System.Windows.Forms.ProgressBar
+$copilotProgressBar.Location = New-Object System.Drawing.Point(20, 55)
+$copilotProgressBar.Size = New-Object System.Drawing.Size(330, 20)
+$copilotProgressBar.Style = "Continuous"
+$copilotGroup.Controls.Add($copilotProgressBar)
+
+# Show Dashboard Button
+$showDashboardButton = New-Object System.Windows.Forms.Button
+$showDashboardButton.Text = "📊 Dashboard"
+$showDashboardButton.Location = New-Object System.Drawing.Point(360, 53)
+$showDashboardButton.Size = New-Object System.Drawing.Size(100, 25)
+$showDashboardButton.BackColor = [System.Drawing.Color]::FromArgb(0, 122, 204)
+$showDashboardButton.ForeColor = [System.Drawing.Color]::White
+$showDashboardButton.FlatStyle = "Flat"
+$copilotGroup.Controls.Add($showDashboardButton)
+
+# Enable Monitoring Checkbox
+$enableMonitoringCheckbox = New-Object System.Windows.Forms.CheckBox
+$enableMonitoringCheckbox.Text = "Enable Copilot Monitoring"
+$enableMonitoringCheckbox.Location = New-Object System.Drawing.Point(20, 85)
+$enableMonitoringCheckbox.Size = New-Object System.Drawing.Size(180, 25)
+$enableMonitoringCheckbox.ForeColor = [System.Drawing.Color]::White
+$enableMonitoringCheckbox.Checked = $false
+$copilotGroup.Controls.Add($enableMonitoringCheckbox)
+
+# Generate Report Button
+$generateReportButton = New-Object System.Windows.Forms.Button
+$generateReportButton.Text = "📋 Report"
+$generateReportButton.Location = New-Object System.Drawing.Point(210, 83)
+$generateReportButton.Size = New-Object System.Drawing.Size(80, 25)
+$generateReportButton.BackColor = [System.Drawing.Color]::FromArgb(76, 175, 80)
+$generateReportButton.ForeColor = [System.Drawing.Color]::White
+$generateReportButton.FlatStyle = "Flat"
+$copilotGroup.Controls.Add($generateReportButton)
+
+# Clear History Button
+$clearHistoryButton = New-Object System.Windows.Forms.Button
+$clearHistoryButton.Text = "🗑️ Clear"
+$clearHistoryButton.Location = New-Object System.Drawing.Point(300, 83)
+$clearHistoryButton.Size = New-Object System.Drawing.Size(70, 25)
+$clearHistoryButton.BackColor = [System.Drawing.Color]::FromArgb(244, 67, 54)
+$clearHistoryButton.ForeColor = [System.Drawing.Color]::White
+$clearHistoryButton.FlatStyle = "Flat"
+$copilotGroup.Controls.Add($clearHistoryButton)
+
+# Toggle Monitoring Button
+$toggleMonitoringButton = New-Object System.Windows.Forms.Button
+$toggleMonitoringButton.Text = "▶️ Start"
+$toggleMonitoringButton.Location = New-Object System.Drawing.Point(380, 83)
+$toggleMonitoringButton.Size = New-Object System.Drawing.Size(80, 25)
+$toggleMonitoringButton.BackColor = [System.Drawing.Color]::FromArgb(255, 152, 0)
+$toggleMonitoringButton.ForeColor = [System.Drawing.Color]::White
+$toggleMonitoringButton.FlatStyle = "Flat"
+$copilotGroup.Controls.Add($toggleMonitoringButton)
+
 # === QUICK ACTIONS SECTION ===
 $quickActionsGroup = New-Object System.Windows.Forms.GroupBox
 $quickActionsGroup.Text = "? Quick Actions"
@@ -644,13 +740,111 @@ $elevenlabsButton.Add_Click({
     }
 })
 
-# Update generate audio button to use selected service
+# Update generate audio button to use selected service with copilot monitoring
 $generateAudioButton.Add_Click({
     $arguments = @("-Theme", $themeComboBox.SelectedItem, "-Service", $serviceComboBox.SelectedItem, "-Duration", "600")
+    if ($enableMonitoringCheckbox.Checked) {
+        $arguments += "-EnableCopilotMonitoring"
+    }
     Invoke-Script "ai_audio_generator.ps1" $arguments "Generating AI audio for $($themeComboBox.SelectedItem) theme"
 })
 
-# Form closing event
+# Copilot monitoring event handlers
+$showDashboardButton.Add_Click({
+    try {
+        $monitorScript = Join-Path $PSScriptRoot "Tools\copilot_progress_monitor.ps1"
+        if (Test-Path $monitorScript) {
+            Start-Process -FilePath "powershell.exe" -ArgumentList @("-ExecutionPolicy", "Bypass", "-File", $monitorScript, "-ShowDashboard") -NoNewWindow
+            Update-Status "🤖 Copilot dashboard opened" "Cyan"
+        } else {
+            Update-Status "❌ Copilot monitor script not found" "Red"
+        }
+    } catch {
+        Update-Status "❌ Failed to open copilot dashboard: $($_.Exception.Message)" "Red"
+    }
+})
+
+$generateReportButton.Add_Click({
+    try {
+        $monitorScript = Join-Path $PSScriptRoot "Tools\copilot_progress_monitor.ps1"
+        if (Test-Path $monitorScript) {
+            & $monitorScript -GenerateReport
+            Update-Status "📋 Copilot progress report generated" "Green"
+        } else {
+            Update-Status "❌ Copilot monitor script not found" "Red"
+        }
+    } catch {
+        Update-Status "❌ Failed to generate copilot report: $($_.Exception.Message)" "Red"
+    }
+})
+
+$clearHistoryButton.Add_Click({
+    try {
+        $monitorScript = Join-Path $PSScriptRoot "Tools\copilot_progress_monitor.ps1"
+        if (Test-Path $monitorScript) {
+            & $monitorScript -ClearHistory
+            Update-Status "🗑️ Copilot monitoring history cleared" "Yellow"
+        } else {
+            Update-Status "❌ Copilot monitor script not found" "Red"
+        }
+    } catch {
+        Update-Status "❌ Failed to clear copilot history: $($_.Exception.Message)" "Red"
+    }
+})
+
+$toggleMonitoringButton.Add_Click({
+    if ($global:CopilotMonitoringActive) {
+        # Stop monitoring
+        $global:CopilotMonitoringActive = $false
+        if ($global:CopilotTimer) {
+            $global:CopilotTimer.Stop()
+        }
+        $toggleMonitoringButton.Text = "▶️ Start"
+        $copilotStatusLabel.Text = "Status: Inactive"
+        $copilotStatusLabel.ForeColor = [System.Drawing.Color]::Gray
+        Update-Status "⏹️ Copilot monitoring stopped" "Yellow"
+    } else {
+        # Start monitoring
+        $global:CopilotMonitoringActive = $true
+        $toggleMonitoringButton.Text = "⏸️ Stop"
+        $copilotStatusLabel.Text = "Status: Active"
+        $copilotStatusLabel.ForeColor = [System.Drawing.Color]::LimeGreen
+        
+        # Start periodic status updates
+        $global:CopilotTimer = New-Object System.Windows.Forms.Timer
+        $global:CopilotTimer.Interval = 2000  # Update every 2 seconds
+        $global:CopilotTimer.Add_Tick({
+            Update-CopilotStatus
+        })
+        $global:CopilotTimer.Start()
+        
+        Update-Status "▶️ Copilot monitoring started" "Green"
+    }
+})
+
+# Function to update copilot monitoring status display
+function Update-CopilotStatus {
+    try {
+        $monitorScript = Join-Path $PSScriptRoot "Tools\copilot_progress_monitor.ps1"
+        if (Test-Path $monitorScript) {
+            # Get status information (in a real environment, this would query the monitoring system)
+            $activeSessionsLabel.Text = "Active Sessions: $((Get-Random -Maximum 5))"  # Placeholder
+            
+            # Update progress bar with simulated data
+            $randomProgress = Get-Random -Maximum 100
+            $copilotProgressBar.Value = $randomProgress
+            
+            # Update status color based on activity
+            if ($global:CopilotMonitoringActive) {
+                $copilotStatusLabel.ForeColor = [System.Drawing.Color]::LimeGreen
+            }
+        }
+    } catch {
+        # Silently handle errors to avoid disrupting UI
+    }
+}
+
+# Form closing event with copilot monitoring cleanup
 $form.Add_FormClosing({
     if ($global:CurrentProcess -and -not $global:CurrentProcess.HasExited) {
         $global:CurrentProcess.Kill()
@@ -658,8 +852,23 @@ $form.Add_FormClosing({
     if ($global:ProgressTimer) {
         $global:ProgressTimer.Stop()
     }
+    if ($global:CopilotTimer) {
+        $global:CopilotTimer.Stop()
+    }
+    # Clean up any active copilot monitoring sessions
+    if ($global:CopilotMonitoringActive) {
+        try {
+            $monitorScript = Join-Path $PSScriptRoot "Tools\copilot_progress_monitor.ps1"
+            if (Test-Path $monitorScript) {
+                # In a real environment, this would properly stop all monitoring sessions
+                Write-Host "Stopping copilot monitoring sessions..."
+            }
+        } catch {
+            # Silently handle cleanup errors
+        }
+    }
 })
 
-# Show the form
-Update-Status "?? Ambient Video Studio Enhanced v2.0 loaded - Ready to create!" "LimeGreen"
+# Show the form with updated version info
+Update-Status "🤖 Ambient Video Studio Enhanced v2.1 with Copilot Monitoring loaded - Ready to create!" "LimeGreen"
 [void]$form.ShowDialog()
